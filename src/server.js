@@ -1,6 +1,7 @@
 import http from "http";
 import WebSocket from "ws";
 import express from "express";
+import { createSocket } from "dgram";
 
 const app = express();
 
@@ -16,10 +17,16 @@ const handleListen = () => console.log(`Listening on http://localhost:3000 and w
 const server = http.createServer(app);
 const wss = new WebSocket.Server({server});
 
-function handleConnection(socket) {
-    // here, socket means connected browser
-    console.log(socket);
-  }
-wss.on("connection", handleConnection);
+
+wss.on("connection", (socket) => {
+    // here, socket means connected browser.
+    console.log("Connected to Browser");
+    socket.send("hello!!");
+    socket.on("close", () => console.log("Disconnected from the Browser"));
+    socket.on("message", (message) => {
+        console.log(message.toString('utf-8'));
+    })
+});
+
 
 server.listen(3000, handleListen);
